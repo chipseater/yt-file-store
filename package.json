@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/index.js\""
+    "dev": "concurrently \"yarn tsc --watch\" \"nodemon -q dist/index.js\""
   },
   "repository": "https://github.com/chipseater/yt-file-store.git",
   "author": "chipseater <jeanpauldemalet@yahoo.fr>",
