@@ -1,5 +1,8 @@
-import fs from 'fs'
-import canvas, { Canvas, createCanvas } from 'canvas'
+import fs, { createWriteStream } from 'fs'
+import canvas, { Canvas, createCanvas, ImageData } from 'canvas'
+import { Readable } from 'stream'
+import ffmpeg, { FfmpegCommand, FfprobeData } from 'fluent-ffmpeg'
+import { PNG } from 'pngjs'
 
 export default class CustomFile {
   path: string
@@ -14,24 +17,31 @@ export default class CustomFile {
     }
   }
 
+  getFileName() {
+    const lastIndex = this.path.split('/').length - 1
+    return this.path.split('/')[lastIndex].split('.')[0]
+  }
+
   dumpData(path: string, hex_value: string): void {
     this.content = hex_value
     fs.writeFileSync(path, hex_value, { encoding: 'hex' })
   }
 
-  toFrames(width: number = 1280, height: number = 720): Canvas[] {
+  toFrames(width: number = 1280, height: number = 720) {
     const nb_of_pixels = this.content.length / 3
     const nb_of_frames = nb_of_pixels / (width * height)
-    const frames: Canvas[] = []
+    const png_frames: PNG[] = []
 
     for (let i = 0; i < nb_of_frames; i++) {
-      const canvas = createCanvas(width, height)
-      const ctx = canvas.getContext('2d')
+      const frame = createCanvas(width, height)
+      const ctx = frame.getContext('2d')
 
       for (let x = 0; x < width; x++) {
         for (let y = 0; y < height; y++) {
+          // One byte per color channel
+          const index = i * x * y * 3
+          if (index + 3 > this.content.length) break
           const image_data = new ImageData(1, 1)
-          const index = x * y * 3
           image_data.data[0] = parseInt(this.content[index], 16) * 16
           image_data.data[1] = parseInt(this.content[index + 1], 16) * 16
           image_data.data[2] = parseInt(this.content[index + 2], 16) * 16
@@ -39,7 +49,12 @@ export default class CustomFile {
           ctx.putImageData(image_data, x, y)
         }
       }
+
+      const imageData = ctx.getImageData(0, 0, width, height)
+      const png = new PNG({ width: width, height: height })
+      png.data = Buffer.from(imageData.data.buffer)
+      PNG.sync.write(png)
+      png_frames.push(png)
     }
-    return frames
   }
 }
