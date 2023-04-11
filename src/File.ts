@@ -42,10 +42,10 @@ export default class CustomFile {
           // One byte per color channel
           const index = i * x * y * 3
           if (index + 3 > this.content.length) break
-          const image_data = new ImageData(1, 1)
+          const image_data = new ImageData(10, 10)
           image_data.data[0] = parseInt(this.content[index], 16) * 16
           image_data.data[1] = parseInt(this.content[index + 1], 16) * 16
-          image_data.data[2] = parseInt(this.content[index + 2], 16) * 16
+          image_data.data[2] = parseInt(this.content[index + 2], 16) *16
           image_data.data[3] = 255
           ctx.putImageData(image_data, x, y)
         }
@@ -54,6 +54,7 @@ export default class CustomFile {
       const imageData = ctx.getImageData(0, 0, width, height)
       const png = new PNG({ width: width, height: height })
       png.data = Buffer.from(imageData.data.buffer)
+      fs.writeFileSync(`out/frames/frame${i}.png`, PNG.sync.write(png))
       pngStream.push(PNG.sync.write(png))
     }
 
@@ -62,7 +63,7 @@ export default class CustomFile {
     command.videoCodec('libx264')
     command.outputOptions('-framerate', '30')
     command.outputOptions('-s', `${width}x${height}`)
-    command.output(`/out/${this.getFileName()}.mp4`)
+    command.output(`out/${this.getFileName()}.mp4`)
     command.format('mp4')
 
     return command
