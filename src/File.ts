@@ -30,7 +30,8 @@ export default class CustomFile {
   toFrames(width: number = 1280, height: number = 720) {
     const nb_of_pixels = this.content.length / 3
     const nb_of_frames = nb_of_pixels / (width * height)
-    const png_frames: PNG[] = []
+    const command = ffmpeg()
+    const pngStream = new Readable()
 
     for (let i = 0; i < nb_of_frames; i++) {
       const frame = createCanvas(width, height)
@@ -53,8 +54,17 @@ export default class CustomFile {
       const imageData = ctx.getImageData(0, 0, width, height)
       const png = new PNG({ width: width, height: height })
       png.data = Buffer.from(imageData.data.buffer)
-      PNG.sync.write(png)
-      png_frames.push(png)
+      pngStream.push(PNG.sync.write(png))
     }
+
+    pngStream.push(null)
+    command.input(pngStream)
+    command.videoCodec('libx264')
+    command.outputOptions('-framerate', '30')
+    command.outputOptions('-s', `${width}x${height}`)
+    command.output(`/out/${this.getFileName()}.mp4`)
+    command.format('mp4')
+
+    return command
   }
 }
