@@ -28,24 +28,22 @@ export default class CustomFile {
   }
 
   toFrames(width: number = 1280, height: number = 720) {
-    const nb_of_pixels = this.content.length / 3
-    const nb_of_frames = nb_of_pixels / (width * height)
     const command = ffmpeg()
     const pngStream = new Readable()
-
-    for (let i = 0; i < nb_of_frames; i++) {
+    
+    // Problem: does not output the last frame with the remaining bytes
+    for (let i = 0; i < this.content.length - 2; i += 3 * width * height) {
       const frame = createCanvas(width, height)
       const ctx = frame.getContext('2d')
 
       for (let x = 0; x < width; x++) {
         for (let y = 0; y < height; y++) {
           // One byte per color channel
-          const index = i * x * y * 3
-          if (index + 3 > this.content.length) break
-          const image_data = new ImageData(10, 10)
+          const image_data = new ImageData(1, 1)
+          const index = i + y * width + x
           image_data.data[0] = parseInt(this.content[index], 16) * 16
           image_data.data[1] = parseInt(this.content[index + 1], 16) * 16
-          image_data.data[2] = parseInt(this.content[index + 2], 16) *16
+          image_data.data[2] = parseInt(this.content[index + 2], 16) * 16
           image_data.data[3] = 255
           ctx.putImageData(image_data, x, y)
         }
@@ -54,7 +52,7 @@ export default class CustomFile {
       const imageData = ctx.getImageData(0, 0, width, height)
       const png = new PNG({ width: width, height: height })
       png.data = Buffer.from(imageData.data.buffer)
-      fs.writeFileSync(`out/frames/frame${i}.png`, PNG.sync.write(png))
+      fs.writeFileSync(`out/frames/frame${i / (3 * width * height)}.png`, PNG.sync.write(png))
       pngStream.push(PNG.sync.write(png))
     }
 
