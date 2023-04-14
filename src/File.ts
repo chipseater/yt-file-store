@@ -30,9 +30,11 @@ export default class CustomFile {
   toFrames(width: number = 1280, height: number = 720) {
     const command = ffmpeg()
     const pngStream = new Readable()
+    const frame_qt = this.content.length + 3 * width * height - 2
+    console.log(this.content.length / (3 * width * height))
     
     // Problem: does not output the last frame with the remaining bytes
-    for (let i = 0; i < this.content.length - 2; i += 3 * width * height) {
+    for (let i = 0; i < this.content.length; i += 3 * width * height) {
       const frame = createCanvas(width, height)
       const ctx = frame.getContext('2d')
 
@@ -41,9 +43,15 @@ export default class CustomFile {
           // One byte per color channel
           const image_data = new ImageData(1, 1)
           const index = i + y * width + x
-          image_data.data[0] = parseInt(this.content[index], 16) * 16
-          image_data.data[1] = parseInt(this.content[index + 1], 16) * 16
-          image_data.data[2] = parseInt(this.content[index + 2], 16) * 16
+          if (index <= this.content.length) {
+            image_data.data[0] = parseInt(this.content[index], 16) * 16
+            image_data.data[1] = parseInt(this.content[index + 1], 16) * 16
+            image_data.data[2] = parseInt(this.content[index + 2], 16) * 16
+          } else {
+            image_data.data[0] = 255
+            image_data.data[1] = 255
+            image_data.data[2] = 255
+          }
           image_data.data[3] = 255
           ctx.putImageData(image_data, x, y)
         }
