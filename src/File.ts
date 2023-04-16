@@ -13,7 +13,7 @@ export default class CustomFile {
     this.content = fs.readFileSync(this.path, 'hex')
   }
 
-  getFileName() {
+  getFileName(): string {
     const lastIndex = this.path.split('/').length - 1
     return this.path.split('/')[lastIndex].split('.')[0]
   }
@@ -23,7 +23,7 @@ export default class CustomFile {
     fs.writeFileSync(path, hex_value, { encoding: 'hex' })
   }
 
-  toFilm(width: number = 1280, height: number = 720) {
+  toFilm(width: number = 1280, height: number = 720): Film {
     const pngStream = new Readable()
     
     for (let i = 0; i <= this.content.length / (3 * width * height); i++) {
