@@ -1,7 +1,8 @@
 import { createCanvas, ImageData } from 'canvas'
+import fs from 'fs'
 import { PNG } from 'pngjs'
 
-export default class Frame {
+export default class {
   height: number
   width: number
   content: string
@@ -40,5 +41,9 @@ export default class Frame {
     png.data = Buffer.from(imageData.data.buffer)
 
     return png
+  }
+
+  writeToFile(path: string) {
+    fs.writeFileSync(path, PNG.sync.write(this.getPNG()))
   }
 }
