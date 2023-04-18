@@ -18,20 +18,19 @@ export default class Film {
     if (stream)
       this.command = ffmpeg()
         .input(stream)
-        .videoCodec('libx264')
-        .outputOptions('-framerate', `${framerate}`)
-        .outputOptions('-s', `${width}x${height}`)
+        .outputOptions([
+          '-c:v', 'ffv1',
+          `-framerate`, `${framerate}`,
+          `-s`, `${width}x${height}`,
+        ])
         .output(this.path)
-        .format('mp4')
+        .format('matroska')
   }
 
   toFile() {
     ffmpeg()
       .input(this.path)
-      .outputOptions([
-        '-vf', `fps=${this.framerate}`,
-        '-q:v', '0'
-      ])
+      .outputOptions(['-vf', `fps=${this.framerate}`, '-q:v', '0'])
       .output(`in/frames/frame-%04d.png`)
       .run()
   }

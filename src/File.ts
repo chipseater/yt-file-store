@@ -36,6 +36,6 @@ export default class CustomFile {
 
     pngStream.push(null)
 
-    return new Film(`out/${this.getFileName()}.mp4`, pngStream)
+    return new Film(`out/${this.getFileName()}.mkv`, pngStream)
   }
 }
