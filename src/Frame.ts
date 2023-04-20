@@ -1,6 +1,6 @@
 import { createCanvas, ImageData } from 'canvas'
 import fs from 'fs'
-import { PNG } from 'pngjs'
+import sharp from 'sharp'
 
 export default class {
   height: number
@@ -13,7 +13,7 @@ export default class {
     this.height = height
   }
 
-  getPNG(): PNG {
+  async getWebp() {
     const frame = createCanvas(this.width, this.height)
     const ctx = frame.getContext('2d')
 
@@ -36,14 +36,14 @@ export default class {
       }
     }
 
-    const imageData = ctx.getImageData(0, 0, this.width, this.height)
-    const png = new PNG({ width: this.width, height: this.height })
-    png.data = Buffer.from(imageData.data.buffer)
-
-    return png
+    const { data } = ctx.getImageData(0, 0, this.width, this.height)
+    return await sharp(data.buffer).webp({ lossless: true }).toBuffer()
   }
 
-  writeToFile(path: string) {
-    fs.writeFileSync(path, PNG.sync.write(this.getPNG()))
+  async writeToFile(path: string) {
+    sharp(await this.getWebp())
+      .toFile(path)
+      .then(res => console.log(res))
+      .catch(err => console.warn(err))
   }
 }

@@ -23,19 +23,19 @@ export default class CustomFile {
     fs.writeFileSync(path, hex_value, { encoding: 'hex' })
   }
 
-  toFilm(width: number = 1280, height: number = 720): Film {
-    const pngStream = new Readable()
+  async toFilm(width: number = 1280, height: number = 720): Promise<Film> {
+    const webpStream = new Readable()
     
     for (let i = 0; i <= this.content.length / (3 * width * height); i++) {
       const startIndex = i * 3 * width * height
       const endIndex = (i + 1) * 3 * width * height
       const frame = new Frame(this.content.slice(startIndex, endIndex), width, height)
-      frame.writeToFile(`out/frames/frame${i}.png`)
-      pngStream.push(PNG.sync.write(frame.getPNG()))
+      frame.writeToFile(`out/frames/frame${i}.webp`)
+      // webpStream.push(await frame.getWebp())
     }
 
-    pngStream.push(null)
+    webpStream.push(null)
 
-    return new Film(`out/${this.getFileName()}.mkv`, pngStream)
+    return new Film(`out/${this.getFileName()}.mkv`, webpStream)
   }
 }
