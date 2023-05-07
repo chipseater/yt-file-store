@@ -36,14 +36,18 @@ export default class {
       }
     }
 
-    const { data } = ctx.getImageData(0, 0, this.width, this.height)
-    return await sharp(data.buffer).webp({ lossless: true }).toBuffer()
+    return await sharp(frame.toBuffer('image/png'))
+      .png({
+        compressionLevel: 0, // set compression level to 0 for lossless compression
+        adaptiveFiltering: false, // disable adaptive filtering for lossless compression
+      })
+      .toBuffer()
   }
 
   async writeToFile(path: string) {
     sharp(await this.getWebp())
       .toFile(path)
-      .then(res => console.log(res))
+      .then(res => {console.log('hi');console.log(res)})
       .catch(err => console.warn(err))
   }
 }

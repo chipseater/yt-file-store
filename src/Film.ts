@@ -30,7 +30,10 @@ export default class Film {
   toFile() {
     ffmpeg()
       .input(this.path)
-      .outputOptions(['-vf', `fps=${this.framerate}`, '-q:v', '0'])
+      .outputOptions([
+        '-q:v 1', // Output quality
+        '-vsync 0', // Disable frame rate conversion
+      ])
       .output(`in/frames/frame-%04d.png`)
       .run()
   }

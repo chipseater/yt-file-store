@@ -30,8 +30,8 @@ export default class CustomFile {
       const startIndex = i * 3 * width * height
       const endIndex = (i + 1) * 3 * width * height
       const frame = new Frame(this.content.slice(startIndex, endIndex), width, height)
-      frame.writeToFile(`out/frames/frame${i}.webp`)
-      // webpStream.push(await frame.getWebp())
+      await frame.writeToFile(`out/frames/frame${i}.png`)
+      webpStream.push(await frame.getWebp())
     }
 
     webpStream.push(null)
