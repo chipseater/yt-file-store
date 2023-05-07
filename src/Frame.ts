@@ -22,15 +22,20 @@ export default class {
         const image_data = new ImageData(1, 1)
         const index = y * this.width + x
         if (this.content.length > index) {
-          image_data.data[0] = parseInt(this.content[index], 16) * 16
-          image_data.data[1] = parseInt(this.content[index + 1], 16) * 16
-          image_data.data[2] = parseInt(this.content[index + 2], 16) * 16
+          const segment = this.content
+            .slice(index, index + 6)
+            .split('')
+            .map(item => parseInt(item, 16))
+          image_data.data[0] = segment[0] * segment[1]
+          image_data.data[1] = segment[2] * segment[3]
+          image_data.data[2] = segment[4] * segment[5]
+          image_data.data[3] = 255
         } else {
-          image_data.data[0] = 255
-          image_data.data[1] = 255
-          image_data.data[2] = 255
+          image_data.data[0] = 0
+          image_data.data[1] = 0
+          image_data.data[2] = 0
+          image_data.data[3] = 0
         }
-        image_data.data[3] = 255
         ctx.putImageData(image_data, x, y)
       }
     }
