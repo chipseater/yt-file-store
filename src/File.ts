@@ -23,18 +23,18 @@ export default class CustomFile {
   }
 
   async toFilm(width: number = 1280, height: number = 720): Promise<Film> {
-    const webpStream = new Readable()
+    const imageStream = new Readable()
     
     for (let i = 0; i <= this.content.length / (3 * width * height); i++) {
       const startIndex = i * 3 * width * height
       const endIndex = (i + 1) * 3 * width * height
       const frame = new Frame(this.content.slice(startIndex, endIndex), width, height)
       await frame.writeToFile(`out/frames/frame${i}.png`)
-      webpStream.push(await frame.getWebp())
+      imageStream.push(await frame.getImage())
     }
 
-    webpStream.push(null)
+    imageStream.push(null)
 
-    return new Film(this.getFileName(), webpStream)
+    return new Film(this.getFileName(), imageStream)
   }
 }

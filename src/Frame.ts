@@ -12,7 +12,7 @@ export default class {
     this.height = height
   }
 
-  async getWebp() {
+  async getImage() {
     const frame = createCanvas(this.width, this.height)
     const ctx = frame.getContext('2d')
 
@@ -44,9 +44,9 @@ export default class {
   }
 
   async writeToFile(path: string) {
-    sharp(await this.getWebp())
+    sharp(await this.getImage())
       .toFile(path)
-      .then(res => {console.log('hi');console.log(res)})
-      .catch(err => console.warn(err))
+      .then((res) => console.log(res))
+      .catch((err) => console.warn(err))
   }
 }
