@@ -1,5 +1,4 @@
 import { createCanvas, ImageData } from 'canvas'
-import fs from 'fs'
 import sharp from 'sharp'
 
 export default class {

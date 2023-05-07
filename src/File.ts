@@ -1,4 +1,3 @@
-import { PNG } from 'pngjs'
 import { Readable } from 'stream'
 import fs from 'fs'
 import Frame from './Frame.js'
@@ -36,6 +35,6 @@ export default class CustomFile {
 
     webpStream.push(null)
 
-    return new Film(`out/${this.getFileName()}.mkv`, webpStream)
+    return new Film(this.getFileName(), webpStream)
   }
 }

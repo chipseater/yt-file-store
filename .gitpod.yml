@@ -6,8 +6,7 @@
 
 tasks:
   - init: yarn
-    command: sudo apt update &&
-      sudo apt install ffmpeg &&
+    command: 
       mkdir in && mkdir in/frames &&
       mkdir out/frames &&
       yarn dev
