@@ -1,5 +1,8 @@
 import ffmpeg, { FfmpegCommand } from 'fluent-ffmpeg'
 import { Readable } from 'stream'
+import fs from 'fs'
+import sharp from 'sharp'
+import { resolve } from 'path'
 
 export default class Film {
   path: string
@@ -37,7 +40,7 @@ export default class Film {
     return this.path.split('/')[lastIndex]
   }
 
-  toFile(): Promise<void> {
+  toFrames(): Promise<void> {
     return new Promise((resolve, reject) => {
       ffmpeg()
         .input(this.path)
@@ -52,5 +55,32 @@ export default class Film {
         .on('error', (err: Error) => reject(err.message))
         .run()
     })
+  }
+
+  async getPixels(): Promise<number[]> {
+    await this.toFrames()
+    const folderPath = 'in/frames'
+
+    return new Promise((resolve, reject) => {
+      fs.readdir(folderPath, (err, files) => {
+        if (err) throw err
+
+        const promises = files.map(async (file) => 
+          sharp(`${folderPath}/${file}`)
+            .raw()
+            .toBuffer()
+            .then(buffer => buffer.toJSON().data)
+        )
+
+        Promise.all(promises)
+          .then(pixelArrays => resolve(pixelArrays.flat()))
+          .catch(err => reject(err.message))
+      })
+    })
+  }
+
+  async toFile() {
+    const pixels = await this.getPixels()
+    console.log(pixels)
   }
 }

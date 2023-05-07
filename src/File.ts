@@ -25,9 +25,9 @@ export default class CustomFile {
   async toFilm(width: number = 1280, height: number = 720): Promise<Film> {
     const imageStream = new Readable()
     
-    for (let i = 0; i <= this.content.length / (3 * width * height); i++) {
-      const startIndex = i * 3 * width * height
-      const endIndex = (i + 1) * 3 * width * height
+    for (let i = 0; i <= this.content.length / (6 * width * height); i++) {
+      const startIndex = i * 6 * width * height
+      const endIndex = (i + 1) * 6 * width * height
       const frame = new Frame(this.content.slice(startIndex, endIndex), width, height)
       await frame.writeToFile(`out/frames/frame${i}.png`)
       imageStream.push(await frame.getImage())

@@ -20,15 +20,15 @@ export default class {
       for (let y = 0; y < this.height; y++) {
         // One byte per color channel
         const image_data = new ImageData(1, 1)
-        const index = y * this.width + x
+        const index =  6 * (y * this.width + x)
         if (this.content.length > index) {
           const segment = this.content
             .slice(index, index + 6)
             .split('')
             .map(item => parseInt(item, 16))
-          image_data.data[0] = segment[0] * segment[1]
-          image_data.data[1] = segment[2] * segment[3]
-          image_data.data[2] = segment[4] * segment[5]
+          image_data.data[0] = segment[0] * 16 + segment[1]
+          image_data.data[1] = segment[2] * 16 + segment[3]
+          image_data.data[2] = segment[4] * 16 + segment[5]
           image_data.data[3] = 255
         } else {
           image_data.data[0] = 0
