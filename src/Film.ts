@@ -89,7 +89,8 @@ export default class Film {
       if (pixel[3] == 0) break
       // console.log(pixel)
       const hex_array = pixel.map((channel) => {
-        return channel.toString(16)
+        const hex_value = channel.toString(16)
+        return hex_value ? '0' + hex_value : hex_value
       })
       pixels.push(hex_array)
     }
