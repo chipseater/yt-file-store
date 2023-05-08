@@ -20,30 +20,32 @@ export default class {
       for (let y = 0; y < this.height; y++) {
         // One byte per color channel
         const image_data = new ImageData(1, 1)
-        const index =  6 * (y * this.width + x)
+        const index = 6 * (y * this.width + x)
+        const segment = this.content
+          .slice(index, index + 6)
+          .split('')
+          .map((item) => parseInt(item, 16))
         if (this.content.length > index) {
-          const segment = this.content
-            .slice(index, index + 6)
-            .split('')
-            .map(item => parseInt(item, 16))
           image_data.data[0] = segment[0] * 16 + segment[1]
           image_data.data[1] = segment[2] * 16 + segment[3]
           image_data.data[2] = segment[4] * 16 + segment[5]
           image_data.data[3] = 255
-        } else {
-          image_data.data[0] = 0
-          image_data.data[1] = 0
-          image_data.data[2] = 0
-          image_data.data[3] = 0
         }
         ctx.putImageData(image_data, x, y)
+        if (this.content.length > index) console.log(segment)
+        if (segment.length < 6) {
+          const additional_data = new ImageData(1, 1)
+          additional_data.data[0] = segment.length == 0 ? 255 : 0
+          additional_data.data[1] = segment.length == 2 ? 255 : 0
+          additional_data.data[2] = segment.length == 4 ? 255 : 0
+        }
       }
     }
 
     return await sharp(frame.toBuffer('image/png'))
       .png({
-        compressionLevel: 0, // set compression level to 0 for lossless compression
-        adaptiveFiltering: false, // disable adaptive filtering for lossless compression
+        compressionLevel: 0,
+        adaptiveFiltering: false,
       })
       .toBuffer()
   }
@@ -51,7 +53,6 @@ export default class {
   async writeToFile(path: string) {
     sharp(await this.getImage())
       .toFile(path)
-      .then((res) => console.log(res))
       .catch((err) => console.warn(err))
   }
 }

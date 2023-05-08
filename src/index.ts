@@ -9,11 +9,12 @@ ffmpeg.setFfmpegPath(
   path.join(__dirname, '../node_modules/ffmpeg-static/ffmpeg'),
 )
 
-const file = new File('song.mp3')
-const film = new Film('song')
+const file = new File('README.md')
+const film = new Film('README')
 
 ;(await file.toFilm()).command
   .on('end', () => {
     film.toFile()
   })
   .run()
+  

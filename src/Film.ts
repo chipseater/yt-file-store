@@ -3,6 +3,7 @@ import { Readable } from 'stream'
 import fs from 'fs'
 import sharp from 'sharp'
 import { resolve } from 'path'
+import { channel } from 'diagnostics_channel'
 
 export default class Film {
   path: string
@@ -65,22 +66,33 @@ export default class Film {
       fs.readdir(folderPath, (err, files) => {
         if (err) throw err
 
-        const promises = files.map(async (file) => 
+        const promises = files.map(async (file) =>
           sharp(`${folderPath}/${file}`)
             .raw()
             .toBuffer()
-            .then(buffer => buffer.toJSON().data)
+            .then((buffer) => buffer.toJSON().data),
         )
 
         Promise.all(promises)
-          .then(pixelArrays => resolve(pixelArrays.flat()))
-          .catch(err => reject(err.message))
+          .then((pixelArrays) => resolve(pixelArrays.flat()))
+          .catch((err) => reject(err.message))
       })
     })
   }
 
   async toFile() {
-    const pixels = await this.getPixels()
-    console.log(pixels)
+    const every_channels = await this.getPixels()
+    const pixels = []
+    for (let i = 0; i < every_channels.length; i += 4) {
+      let pixel = every_channels.slice(i, i + 4)
+      if (pixel[3] == 255) pixel = pixel.splice(0, 3)
+      if (pixel[3] == 170) pixel = pixel.splice(0, 2)
+      if (pixel[3] == 85) pixel = pixel.splice(0, 1)
+      if (pixel[3] == 0) break
+      const hex_array = pixel.map((channel) => {
+        return channel.toString(16)
+      })
+      pixels.push(hex_array)
+    }
   }
 }
