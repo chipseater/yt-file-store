@@ -21,24 +21,25 @@ export default class {
         // One byte per color channel
         const image_data = new ImageData(1, 1)
         const index = 6 * (y * this.width + x)
-        const segment = this.content
-          .slice(index, index + 6)
-          .split('')
-          .map((item) => parseInt(item, 16))
         if (this.content.length > index) {
+          const segment = this.content
+            .slice(index, index + 6)
+            .split('')
+            .map((item) => parseInt(item, 16))
           image_data.data[0] = segment[0] * 16 + segment[1]
           image_data.data[1] = segment[2] * 16 + segment[3]
           image_data.data[2] = segment[4] * 16 + segment[5]
-          image_data.data[3] = 255
+          if (segment.length == 6) image_data.data[3] = 255
+          if (segment.length == 4) image_data.data[3] = 200
+          if (segment.length == 2) image_data.data[3] = 150
+          // console.log(segment)
+        } else {
+          image_data[0] = 0
+          image_data[1] = 0
+          image_data[2] = 0
+          image_data[3] = 0
         }
         ctx.putImageData(image_data, x, y)
-        if (this.content.length > index) console.log(segment)
-        if (segment.length < 6) {
-          const additional_data = new ImageData(1, 1)
-          additional_data.data[0] = segment.length == 0 ? 255 : 0
-          additional_data.data[1] = segment.length == 2 ? 255 : 0
-          additional_data.data[2] = segment.length == 4 ? 255 : 0
-        }
       }
     }
 
@@ -50,8 +51,8 @@ export default class {
       .toBuffer()
   }
 
-  async writeToFile(path: string) {
-    sharp(await this.getImage())
+  async writeToFile(path: string, image: Buffer) {
+    sharp(image)
       .toFile(path)
       .catch((err) => console.warn(err))
   }

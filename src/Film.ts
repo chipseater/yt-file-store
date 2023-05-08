@@ -2,8 +2,6 @@ import ffmpeg, { FfmpegCommand } from 'fluent-ffmpeg'
 import { Readable } from 'stream'
 import fs from 'fs'
 import sharp from 'sharp'
-import { resolve } from 'path'
-import { channel } from 'diagnostics_channel'
 
 export default class Film {
   path: string
@@ -80,19 +78,23 @@ export default class Film {
     })
   }
 
-  async toFile() {
+  async toFile(path: string) {
     const every_channels = await this.getPixels()
     const pixels = []
     for (let i = 0; i < every_channels.length; i += 4) {
       let pixel = every_channels.slice(i, i + 4)
       if (pixel[3] == 255) pixel = pixel.splice(0, 3)
-      if (pixel[3] == 170) pixel = pixel.splice(0, 2)
-      if (pixel[3] == 85) pixel = pixel.splice(0, 1)
+      if (pixel[3] == 200) pixel = pixel.splice(0, 2)
+      if (pixel[3] == 150) pixel = pixel.splice(0, 1)
       if (pixel[3] == 0) break
+      // console.log(pixel)
       const hex_array = pixel.map((channel) => {
         return channel.toString(16)
       })
       pixels.push(hex_array)
     }
+    const hex_content = pixels.flat().reduce((a, b) => a + b)
+    fs.writeFileSync(path, hex_content, { encoding: 'hex' })
+    return hex_content
   }
 }

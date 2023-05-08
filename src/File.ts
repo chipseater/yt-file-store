@@ -29,8 +29,9 @@ export default class CustomFile {
       const startIndex = i * 6 * width * height
       const endIndex = (i + 1) * 6 * width * height
       const frame = new Frame(this.content.slice(startIndex, endIndex), width, height)
-      await frame.writeToFile(`out/frames/frame${i}.png`)
-      imageStream.push(await frame.getImage())
+      const image = await frame.getImage()
+      await frame.writeToFile(`out/frames/frame${i}.png`, image)
+      imageStream.push(image)
     }
 
     imageStream.push(null)

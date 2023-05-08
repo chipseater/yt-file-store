@@ -9,12 +9,13 @@ ffmpeg.setFfmpegPath(
   path.join(__dirname, '../node_modules/ffmpeg-static/ffmpeg'),
 )
 
-const file = new File('README.md')
-const film = new Film('README')
+const file = new File('song.mp3')
+const film = new Film('song')
 
 ;(await file.toFilm()).command
-  .on('end', () => {
-    film.toFile()
+  .on('end', async () => {
+    const hex_content = await film.toFile('song_copy.mp3')
+    console.log(hex_content.length, file.content.length)
   })
   .run()
   
